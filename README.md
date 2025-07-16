@@ -1,78 +1,45 @@
 # 🍎 FoodSaver Mobile App
 
-A React Native mobile application built with Expo to help users reduce food waste by tracking food items, managing expiration dates, and getting timely alerts.
+A React Native mobile application to help users track food items and prevent food waste by monitoring expiry dates.
 
-## 📱 Features
+## 🚀 Features
 
-### 🔐 Authentication
-- Email/password-based authentication
-- Secure user sessions
-- Automatic login state management
+- **User Authentication** - Sign up and sign in with email/password
+- **Add Food Items** - Track food with categories, expiry dates, and photos
+- **View Food Items** - Clean list interface with expiry status indicators
+- **Firebase Integration** - Real-time data sync with Firestore
+- **Offline Support** - Works offline with local storage
+- **Image Upload** - Add photos to food items
 
-### 🥘 Food Management
-- **Add Food Items**: Capture food photos, set names, categories, and expiry dates
-- **Edit Items**: Modify existing food item details
-- **Delete Items**: Remove consumed or expired items
-- **Visual Status**: Color-coded indicators for expiry status
+## 🛠️ Tech Stack
 
-### 📸 Image Handling
-- Camera integration for taking food photos
-- Gallery access for selecting existing images
-- Automatic image upload to Firebase Storage
-- Optimized image compression and storage
+- **React Native** with Expo
+- **Firebase** (Authentication, Firestore, Storage)
+- **AsyncStorage** for offline persistence
+- **React Navigation** for screen navigation
 
-### 🔔 Smart Alerts
-- **Expiry Tracking**: Automatic calculation of days until expiry
-- **Status Categories**: 
-  - 🟢 Fresh (7+ days)
-  - 🟡 Expiring This Week (4-7 days)
-  - 🟠 Expiring Soon (1-3 days)
-  - 🔴 Expired (past due)
+## 📱 Screenshots
 
-### 🏷️ Food Categories
-- Dairy & Eggs 🥛
-- Meat & Fish 🥩
-- Vegetables 🥬
-- Fruits 🍎
-- Grains & Bread 🍞
-- Beverages 🥤
-- Snacks 🍿
-- Frozen Foods 🧊
-- Canned Goods 🥫
-- Condiments 🧂
-- Other 📦
+- Login/Signup Screen
+- Home Screen (Food Items List)
+- Add Food Item Screen
+- Item Detail Screen
 
-## 🛠️ Technology Stack
-
-### Core Technologies
-- **React Native** - Mobile app framework
-- **Expo** - Development platform and tools
-- **Firebase** - Backend services (Auth, Firestore, Storage)
-- **React Navigation** - Screen navigation
-
-### Key Libraries
-- `@react-navigation/native` - Navigation framework
-- `@react-navigation/stack` - Stack navigation
-- `firebase` - Firebase SDK
-- `expo-image-picker` - Image selection and camera
-- `expo-notifications` - Push notifications
-- `@react-native-community/datetimepicker` - Date/time selection
-- `@expo/vector-icons` - Icon library
-
-## 🚀 Getting Started
+## 🔧 Setup Instructions
 
 ### Prerequisites
+
 - Node.js (v14 or higher)
 - npm or yarn
-- Expo CLI (`npm install -g @expo/cli`)
-- Expo Go app on your mobile device
+- Expo CLI
+- Firebase project
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd FoodSaverMobile
+   git clone https://github.com/mohit200008/food-saver-app.git
+   cd food-saver-app
    ```
 
 2. **Install dependencies**
@@ -80,173 +47,99 @@ A React Native mobile application built with Expo to help users reduce food wast
    npm install
    ```
 
-3. **Configure Firebase**
+3. **Environment Setup**
+   - Copy `.env.example` to `.env`
+   - Fill in your Firebase configuration:
+   ```env
+   FIREBASE_API_KEY=your_api_key_here
+   FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+   FIREBASE_PROJECT_ID=your_project_id
+   FIREBASE_STORAGE_BUCKET=your_project_id.firebasestorage.app
+   FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+   FIREBASE_APP_ID=your_app_id
+   ```
+
+4. **Firebase Setup**
    - Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
    - Enable Authentication (Email/Password)
    - Enable Firestore Database
-   - Enable Storage
-   - Update `src/services/firebase.js` with your Firebase config
+   - Enable Storage (for images)
+   - Get your configuration from Project Settings
 
-4. **Start the development server**
+5. **Run the app**
    ```bash
    npx expo start
    ```
 
-5. **Run on device**
-   - Install Expo Go on your mobile device
-   - Scan the QR code from the terminal
-   - Or press 'a' for Android emulator or 'i' for iOS simulator
+## 🔒 Security
 
-## 🔧 Firebase Configuration
-
-### Required Services
-
-1. **Authentication**
-   - Enable Email/Password sign-in method
-   - Configure user management rules
-
-2. **Firestore Database**
-   - Create collection: `foodItems`
-   - Set up security rules for user data isolation
-
-3. **Storage**
-   - Create bucket for food images
-   - Configure security rules for image uploads
-
-### Security Rules Example
-
-**Firestore Rules:**
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /foodItems/{document} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
-    }
-  }
-}
-```
-
-**Storage Rules:**
-```javascript
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    match /food-images/{allPaths=**} {
-      allow read, write: if request.auth != null;
-    }
-  }
-}
-```
+⚠️ **Important**: Never commit your `.env` file to version control. The `.env` file is already added to `.gitignore` to prevent accidental commits.
 
 ## 📁 Project Structure
 
 ```
-FoodSaverMobile/
-├── src/
-│   ├── components/          # Reusable UI components
-│   ├── constants/           # App constants and configurations
-│   │   ├── colors.js        # Color scheme
-│   │   └── categories.js    # Food categories
-│   ├── screens/             # App screens
-│   │   ├── LoginScreen.js   # Authentication screen
-│   │   ├── HomeScreen.js    # Main food list screen
-│   │   ├── AddItemScreen.js # Add new food item
-│   │   └── ItemDetailScreen.js # Food item details
-│   ├── services/            # API and service functions
-│   │   ├── firebase.js      # Firebase configuration
-│   │   ├── authService.js   # Authentication service
-│   │   └── foodService.js   # Food data management
-│   └── utils/               # Utility functions
-│       └── dateUtils.js     # Date handling utilities
-├── assets/                  # Static assets
-├── App.js                   # Main app component
-└── package.json             # Dependencies
+src/
+├── components/          # Reusable components
+├── constants/          # App constants (colors, categories)
+├── screens/           # Screen components
+│   ├── LoginScreen.js
+│   ├── HomeScreen.js
+│   ├── AddItemScreen.js
+│   └── ItemDetailScreen.js
+├── services/          # Firebase services
+│   ├── firebase.js    # Firebase configuration
+│   ├── authService.js # Authentication service
+│   └── foodService.js # Food items service
+└── utils/             # Utility functions
+    └── dateUtils.js   # Date formatting utilities
 ```
 
-## 📱 App Screens
+## 🚀 Usage
 
-### 1. Login Screen
-- Email/password authentication
-- Sign up and sign in functionality
-- Form validation and error handling
+1. **Sign up/Sign in** with your email and password
+2. **Add food items** by tapping the + button
+3. **View your items** on the home screen
+4. **Track expiry dates** with color-coded status indicators
+5. **Delete items** by tapping the trash icon
 
-### 2. Home Screen
-- List of all food items
-- Pull-to-refresh functionality
-- Floating action button to add items
-- Color-coded expiry status
-- Swipe to delete items
+## 🔧 Configuration
 
-### 3. Add Item Screen
-- Camera and gallery image selection
-- Food name input
-- Category selection with icons
-- Date picker for expiry date
-- Form validation
+### Firebase Configuration
 
-### 4. Item Detail Screen
-- Full food item details
-- Edit mode for updating information
-- Delete functionality
-- Status indicators
+The app uses Firebase for:
+- **Authentication** - User sign up/sign in
+- **Firestore** - Store food items data
+- **Storage** - Store food item images
 
-## 🎨 Design System
+### Environment Variables
 
-### Color Palette
-- **Primary**: #4CAF50 (Green)
-- **Secondary**: #FF9800 (Orange)
-- **Background**: #F5F5F5 (Light Gray)
-- **Surface**: #FFFFFF (White)
-- **Text**: #212121 (Dark Gray)
-- **Error**: #F44336 (Red)
+All sensitive configuration is stored in environment variables:
+- `FIREBASE_API_KEY` - Your Firebase API key
+- `FIREBASE_AUTH_DOMAIN` - Your Firebase auth domain
+- `FIREBASE_PROJECT_ID` - Your Firebase project ID
+- `FIREBASE_STORAGE_BUCKET` - Your Firebase storage bucket
+- `FIREBASE_MESSAGING_SENDER_ID` - Your Firebase messaging sender ID
+- `FIREBASE_APP_ID` - Your Firebase app ID
 
-### Status Colors
-- **Fresh**: #4CAF50 (Green)
-- **Expiring Soon**: #FF9800 (Orange)
-- **Expired**: #F44336 (Red)
+## 🐛 Troubleshooting
 
-## 🔄 Data Flow
+### Common Issues
 
-1. **Authentication**: User signs in → Firebase Auth → App state updates
-2. **Add Item**: User inputs data → Image upload → Firestore save → UI updates
-3. **View Items**: App loads → Firestore query → FlatList render
-4. **Edit Item**: User modifies → Firestore update → UI refresh
-5. **Delete Item**: User confirms → Firestore delete → List refresh
+1. **Firebase Configuration Error**
+   - Ensure all environment variables are set correctly
+   - Check Firebase project settings
 
-## 🚀 Deployment
+2. **Authentication Issues**
+   - Enable Email/Password authentication in Firebase Console
+   - Check if user exists in Firebase Auth
 
-### Expo Build
-```bash
-# Build for Android
-npx expo build:android
+3. **Firestore Index Error**
+   - Create composite index for `foodItems` collection
+   - Fields: `userId` (Ascending) + `expiryDate` (Ascending)
 
-# Build for iOS
-npx expo build:ios
-```
+## 📄 License
 
-### App Store Deployment
-1. Configure app.json with proper app details
-2. Build production version
-3. Submit to App Store/Google Play Store
-
-## 🔮 Future Enhancements
-
-### Planned Features
-- **Push Notifications**: Expiry alerts and reminders
-- **Barcode Scanning**: Automatic product identification
-- **Recipe Suggestions**: Based on available ingredients
-- **Shopping List**: Integration with food tracking
-- **Analytics**: Food waste statistics and insights
-- **Multi-language Support**: Internationalization
-- **Offline Support**: Local data caching
-
-### Technical Improvements
-- **Performance**: Image optimization and lazy loading
-- **Testing**: Unit and integration tests
-- **CI/CD**: Automated build and deployment
-- **Analytics**: User behavior tracking
-- **Crash Reporting**: Error monitoring
+This project is licensed under the MIT License.
 
 ## 🤝 Contributing
 
@@ -256,19 +149,10 @@ npx expo build:ios
 4. Test thoroughly
 5. Submit a pull request
 
-## 📄 License
+## 📞 Support
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Expo Team** - For the excellent development platform
-- **Firebase Team** - For robust backend services
-- **React Native Community** - For the amazing ecosystem
-- **Open Source Contributors** - For inspiration and support
+For support, please open an issue on GitHub or contact the maintainer.
 
 ---
 
-**Made with ❤️ for a sustainable future**
-
-🍎 Reduce food waste, save money, protect the environment! 
+**Note**: This app is designed to help reduce food waste by keeping track of expiry dates. Always check food items manually before consumption. 

@@ -4,14 +4,14 @@ import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Your Firebase configuration
+// Your Firebase configuration from environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyDg8OKn8QervOTD4Ho8TuPV7JptqlhlqDQ",
-  authDomain: "food-saver-app-dca01.firebaseapp.com",
-  projectId: "food-saver-app-dca01",
-  storageBucket: "food-saver-app-dca01.firebasestorage.app",
-  messagingSenderId: "990922375714",
-  appId: "1:990922375714:web:fc5236f0ccf9494dce407b"
+  apiKey: process.env.FIREBASE_API_KEY || "AIzaSyDg8OKn8QervOTD4Ho8TuPV7JptqlhlqDQ",
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN || "food-saver-app-dca01.firebaseapp.com",
+  projectId: process.env.FIREBASE_PROJECT_ID || "food-saver-app-dca01",
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "food-saver-app-dca01.firebasestorage.app",
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || "990922375714",
+  appId: process.env.FIREBASE_APP_ID || "1:990922375714:web:fc5236f0ccf9494dce407b"
 };
 
 // Initialize Firebase with error handling
