@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
   Alert,
   KeyboardAvoidingView,
@@ -12,6 +9,15 @@ import {
 } from 'react-native';
 import { authService } from '../services/authService';
 import { colors } from '../constants/colors';
+import {
+  ResponsiveText,
+  ResponsiveInput,
+  ResponsiveButton,
+} from '../components/ResponsiveComponents';
+import {
+  spacing,
+  isTablet,
+} from '../utils/responsive';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -63,15 +69,16 @@ const LoginScreen = ({ navigation }) => {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.header}>
-          <Text style={styles.title}>🍎 FoodSaver</Text>
-          <Text style={styles.subtitle}>
+          <ResponsiveText variant="title" style={styles.title}>
+            🍎 FoodSaver
+          </ResponsiveText>
+          <ResponsiveText variant="body" style={styles.subtitle}>
             {isSignUp ? 'Create your account' : 'Welcome back!'}
-          </Text>
+          </ResponsiveText>
         </View>
 
         <View style={styles.form}>
-          <TextInput
-            style={styles.input}
+          <ResponsiveInput
             placeholder="Email"
             value={email}
             onChangeText={setEmail}
@@ -80,8 +87,7 @@ const LoginScreen = ({ navigation }) => {
             autoCorrect={false}
           />
 
-          <TextInput
-            style={styles.input}
+          <ResponsiveInput
             placeholder="Password"
             value={password}
             onChangeText={setPassword}
@@ -90,33 +96,31 @@ const LoginScreen = ({ navigation }) => {
           />
 
           {errorMessage ? (
-            <Text style={styles.errorText}>{errorMessage}</Text>
+            <ResponsiveText variant="caption" style={styles.errorText}>
+              {errorMessage}
+            </ResponsiveText>
           ) : null}
 
-          <TouchableOpacity
-            style={[styles.button, isLoading && styles.buttonDisabled]}
+          <ResponsiveButton
+            title={isLoading ? 'Loading...' : (isSignUp ? 'Sign Up' : 'Sign In')}
             onPress={handleAuth}
             disabled={isLoading}
-          >
-            <Text style={styles.buttonText}>
-              {isLoading ? 'Loading...' : (isSignUp ? 'Sign Up' : 'Sign In')}
-            </Text>
-          </TouchableOpacity>
+            size={isTablet ? 'large' : 'medium'}
+          />
 
-          <TouchableOpacity
-            style={styles.switchButton}
+          <ResponsiveButton
+            title={isSignUp 
+              ? 'Already have an account? Sign In' 
+              : "Don't have an account? Sign Up"
+            }
             onPress={() => {
               setIsSignUp(!isSignUp);
               setErrorMessage('');
             }}
-          >
-            <Text style={styles.switchText}>
-              {isSignUp 
-                ? 'Already have an account? Sign In' 
-                : "Don't have an account? Sign Up"
-              }
-            </Text>
-          </TouchableOpacity>
+            variant="secondary"
+            size={isTablet ? 'large' : 'medium'}
+            style={styles.switchButton}
+          />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -131,63 +135,31 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: 20,
+    padding: isTablet ? spacing.xl : spacing.md,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: isTablet ? spacing.xxl : spacing.xl,
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
     color: colors.primary,
-    marginBottom: 10,
+    marginBottom: spacing.sm,
   },
   subtitle: {
-    fontSize: 16,
     color: colors.textSecondary,
     textAlign: 'center',
   },
   form: {
     width: '100%',
   },
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    padding: 15,
-    marginBottom: 15,
-    fontSize: 16,
-  },
-  button: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    padding: 15,
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: colors.surface,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   switchButton: {
-    alignItems: 'center',
-  },
-  switchText: {
-    color: colors.primary,
-    fontSize: 14,
+    marginTop: spacing.sm,
   },
   errorText: {
-    color: '#d32f2f',
-    fontSize: 14,
+    color: colors.error,
     textAlign: 'center',
-    marginBottom: 15,
-    paddingHorizontal: 10,
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.sm,
   },
 });
 

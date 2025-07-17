@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
   Alert,
   ScrollView,
@@ -11,13 +8,24 @@ import {
   KeyboardAvoidingView,
   Platform
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { foodService } from '../services/foodService';
 import { colors } from '../constants/colors';
 import { foodCategories } from '../constants/categories';
 import { generateFileName } from '../utils/dateUtils';
+import {
+  ResponsiveContainer,
+  ResponsiveText,
+  ResponsiveInput,
+  ResponsiveButton,
+  ResponsiveHeader,
+  ResponsiveImageContainer,
+} from '../components/ResponsiveComponents';
+import {
+  spacing,
+  isTablet,
+} from '../utils/responsive';
 
 const AddItemScreen = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -153,91 +161,92 @@ const AddItemScreen = ({ navigation }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color={colors.text} />
-          </TouchableOpacity>
-          <Text style={styles.title}>Add Food Item</Text>
-          <View style={styles.placeholder} />
-        </View>
+        <ResponsiveHeader
+          title="Add Food Item"
+          leftIcon="arrow-back"
+          onLeftPress={() => navigation.goBack()}
+        />
 
-        <View style={styles.form}>
+        <ResponsiveContainer style={styles.form}>
           {/* Image Section */}
           <View style={styles.imageSection}>
-            <Text style={styles.sectionTitle}>Food Image</Text>
-            <TouchableOpacity style={styles.imageContainer} onPress={showImagePickerOptions}>
+            <ResponsiveText variant="subtitle" style={styles.sectionTitle}>
+              Food Image
+            </ResponsiveText>
+            <ResponsiveImageContainer
+              size={isTablet ? 'large' : 'medium'}
+              style={styles.imageContainer}
+              onPress={showImagePickerOptions}
+            >
               {imageUri ? (
                 <Image source={{ uri: imageUri }} style={styles.selectedImage} />
               ) : (
                 <View style={styles.imagePlaceholder}>
-                  <Ionicons name="camera-outline" size={32} color={colors.textSecondary} />
-                  <Text style={styles.imagePlaceholderText}>Add Photo</Text>
+                  <ResponsiveText variant="caption" style={styles.imagePlaceholderText}>
+                    Add Photo
+                  </ResponsiveText>
                 </View>
               )}
-            </TouchableOpacity>
+            </ResponsiveImageContainer>
           </View>
 
           {/* Name Input */}
           <View style={styles.inputSection}>
-            <Text style={styles.sectionTitle}>Food Name</Text>
-            <TextInput
-              style={styles.input}
+            <ResponsiveText variant="subtitle" style={styles.sectionTitle}>
+              Food Name
+            </ResponsiveText>
+            <ResponsiveInput
               placeholder="Enter food item name"
               value={name}
               onChangeText={setName}
+              size={isTablet ? 'large' : 'medium'}
             />
           </View>
 
           {/* Category Selection */}
           <View style={styles.inputSection}>
-            <Text style={styles.sectionTitle}>Category</Text>
+            <ResponsiveText variant="subtitle" style={styles.sectionTitle}>
+              Category
+            </ResponsiveText>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryContainer}>
               {foodCategories.map((cat) => (
-                <TouchableOpacity
+                <ResponsiveButton
                   key={cat.id}
-                  style={[
-                    styles.categoryButton,
-                    category === cat.id && styles.categoryButtonSelected
-                  ]}
+                  title={cat.name}
+                  icon={cat.icon}
                   onPress={() => setCategory(cat.id)}
-                >
-                  <Text style={styles.categoryIcon}>{cat.icon}</Text>
-                  <Text style={[
-                    styles.categoryText,
-                    category === cat.id && styles.categoryTextSelected
-                  ]}>
-                    {cat.name}
-                  </Text>
-                </TouchableOpacity>
+                  variant={category === cat.id ? 'primary' : 'outline'}
+                  size="small"
+                  style={styles.categoryButton}
+                />
               ))}
             </ScrollView>
           </View>
 
           {/* Expiry Date */}
           <View style={styles.inputSection}>
-            <Text style={styles.sectionTitle}>Expiry Date</Text>
-            <TouchableOpacity
-              style={styles.dateButton}
+            <ResponsiveText variant="subtitle" style={styles.sectionTitle}>
+              Expiry Date
+            </ResponsiveText>
+            <ResponsiveButton
+              title={expiryDate.toLocaleDateString()}
+              icon="calendar-outline"
               onPress={() => setShowDatePicker(true)}
-            >
-              <Ionicons name="calendar-outline" size={20} color={colors.text} />
-              <Text style={styles.dateButtonText}>
-                {expiryDate.toLocaleDateString()}
-              </Text>
-            </TouchableOpacity>
+              variant="outline"
+              size={isTablet ? 'large' : 'medium'}
+              style={styles.dateButton}
+            />
           </View>
 
           {/* Submit Button */}
-          <TouchableOpacity
-            style={[styles.submitButton, isLoading && styles.submitButtonDisabled]}
+          <ResponsiveButton
+            title={isLoading ? 'Adding...' : 'Add Food Item'}
             onPress={handleSubmit}
             disabled={isLoading}
-          >
-            <Text style={styles.submitButtonText}>
-              {isLoading ? 'Adding...' : 'Add Food Item'}
-            </Text>
-          </TouchableOpacity>
-        </View>
+            size={isTablet ? 'large' : 'medium'}
+            style={styles.submitButton}
+          />
+        </ResponsiveContainer>
       </ScrollView>
 
       {showDatePicker && (
@@ -261,49 +270,23 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    paddingTop: 60,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  backButton: {
-    padding: 8,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text,
-  },
-  placeholder: {
-    width: 40,
-  },
   form: {
-    padding: 20,
+    padding: isTablet ? spacing.xl : spacing.md,
   },
   imageSection: {
-    marginBottom: 24,
+    marginBottom: isTablet ? spacing.xl : spacing.lg,
+    alignItems: 'center',
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
     color: colors.text,
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   imageContainer: {
     alignSelf: 'center',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    overflow: 'hidden',
-    backgroundColor: colors.surface,
     borderWidth: 2,
     borderColor: colors.border,
     borderStyle: 'dashed',
+    backgroundColor: colors.surface,
   },
   selectedImage: {
     width: '100%',
@@ -315,79 +298,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   imagePlaceholderText: {
-    fontSize: 12,
     color: colors.textSecondary,
-    marginTop: 4,
+    marginTop: spacing.xs,
   },
   inputSection: {
-    marginBottom: 24,
-  },
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    padding: 15,
-    fontSize: 16,
+    marginBottom: isTablet ? spacing.xl : spacing.lg,
   },
   categoryContainer: {
     flexDirection: 'row',
   },
   categoryButton: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    padding: 12,
-    marginRight: 12,
-    alignItems: 'center',
-    minWidth: 80,
-  },
-  categoryButtonSelected: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  categoryIcon: {
-    fontSize: 24,
-    marginBottom: 4,
-  },
-  categoryText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-  categoryTextSelected: {
-    color: colors.surface,
-    fontWeight: '600',
+    marginRight: spacing.md,
+    minWidth: isTablet ? 100 : 80,
   },
   dateButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    padding: 15,
-  },
-  dateButtonText: {
-    fontSize: 16,
-    color: colors.text,
-    marginLeft: 8,
+    justifyContent: 'flex-start',
   },
   submitButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    padding: 15,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  submitButtonDisabled: {
-    opacity: 0.6,
-  },
-  submitButtonText: {
-    color: colors.surface,
-    fontSize: 16,
-    fontWeight: 'bold',
+    marginTop: isTablet ? spacing.xl : spacing.lg,
   },
 });
 

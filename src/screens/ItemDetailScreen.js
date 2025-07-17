@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
-  TouchableOpacity,
   StyleSheet,
   Alert,
   ScrollView,
   Image,
   TextInput
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { foodService } from '../services/foodService';
 import { colors } from '../constants/colors';
@@ -21,6 +18,18 @@ import {
   getDaysUntilExpiry 
 } from '../utils/dateUtils';
 import { getCategoryIcon, getCategoryName } from '../constants/categories';
+import {
+  ResponsiveContainer,
+  ResponsiveText,
+  ResponsiveButton,
+  ResponsiveHeader,
+  ResponsiveImageContainer,
+} from '../components/ResponsiveComponents';
+import {
+  spacing,
+  borderRadius,
+  isTablet,
+} from '../utils/responsive';
 
 const ItemDetailScreen = ({ route, navigation }) => {
   const { item } = route.params;
@@ -96,51 +105,48 @@ const ItemDetailScreen = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.title}>Food Details</Text>
-        <TouchableOpacity 
-          onPress={() => setIsEditing(!isEditing)} 
-          style={styles.editButton}
-        >
-          <Ionicons 
-            name={isEditing ? "close" : "create-outline"} 
-            size={24} 
-            color={colors.text} 
-          />
-        </TouchableOpacity>
-      </View>
+    <ResponsiveContainer style={styles.container}>
+      <ResponsiveHeader
+        title="Food Details"
+        leftIcon="arrow-back"
+        rightIcon={isEditing ? "close" : "create-outline"}
+        onLeftPress={() => navigation.goBack()}
+        onRightPress={() => setIsEditing(!isEditing)}
+      />
 
       <ScrollView contentContainerStyle={styles.content}>
         {/* Image Section */}
         {item.imageUrl && (
           <View style={styles.imageSection}>
-            <Image source={{ uri: item.imageUrl }} style={styles.foodImage} />
+            <ResponsiveImageContainer size={isTablet ? 'large' : 'medium'}>
+              <Image source={{ uri: item.imageUrl }} style={styles.foodImage} />
+            </ResponsiveImageContainer>
           </View>
         )}
 
         {/* Status Badge */}
         <View style={styles.statusSection}>
           <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
-            <Text style={styles.statusText}>{getStatusText(status)}</Text>
+            <ResponsiveText variant="body" style={styles.statusText}>
+              {getStatusText(status)}
+            </ResponsiveText>
           </View>
           {daysUntilExpiry !== null && (
-            <Text style={styles.daysText}>
+            <ResponsiveText variant="caption" style={styles.daysText}>
               {daysUntilExpiry < 0 
                 ? `${Math.abs(daysUntilExpiry)} days ago`
                 : `${daysUntilExpiry} days left`
               }
-            </Text>
+            </ResponsiveText>
           )}
         </View>
 
         {/* Food Details */}
         <View style={styles.detailsSection}>
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Name:</Text>
+            <ResponsiveText variant="subtitle" style={styles.detailLabel}>
+              Name:
+            </ResponsiveText>
             {isEditing ? (
               <TextInput
                 style={styles.editInput}
@@ -149,67 +155,73 @@ const ItemDetailScreen = ({ route, navigation }) => {
                 placeholder="Enter food name"
               />
             ) : (
-              <Text style={styles.detailValue}>{item.name}</Text>
+              <ResponsiveText variant="body" style={styles.detailValue}>
+                {item.name}
+              </ResponsiveText>
             )}
           </View>
 
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Category:</Text>
-            <Text style={styles.detailValue}>
+            <ResponsiveText variant="subtitle" style={styles.detailLabel}>
+              Category:
+            </ResponsiveText>
+            <ResponsiveText variant="body" style={styles.detailValue}>
               {categoryIcon} {getCategoryName(item.category)}
-            </Text>
+            </ResponsiveText>
           </View>
 
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Expiry Date:</Text>
+            <ResponsiveText variant="subtitle" style={styles.detailLabel}>
+              Expiry Date:
+            </ResponsiveText>
             {isEditing ? (
-              <TouchableOpacity
-                style={styles.dateButton}
+              <ResponsiveButton
+                title={expiryDate.toLocaleDateString()}
+                icon="calendar-outline"
                 onPress={() => setShowDatePicker(true)}
-              >
-                <Text style={styles.dateButtonText}>
-                  {expiryDate.toLocaleDateString()}
-                </Text>
-                <Ionicons name="calendar-outline" size={16} color={colors.text} />
-              </TouchableOpacity>
+                variant="outline"
+                size="small"
+                style={styles.dateButton}
+              />
             ) : (
-              <Text style={styles.detailValue}>
+              <ResponsiveText variant="body" style={styles.detailValue}>
                 {formatDate(item.expiryDate)}
-              </Text>
+              </ResponsiveText>
             )}
           </View>
 
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Added:</Text>
-            <Text style={styles.detailValue}>
+            <ResponsiveText variant="subtitle" style={styles.detailLabel}>
+              Added:
+            </ResponsiveText>
+            <ResponsiveText variant="body" style={styles.detailValue}>
               {item.createdAt ? formatDate(item.createdAt) : 'Unknown'}
-            </Text>
+            </ResponsiveText>
           </View>
         </View>
 
         {/* Action Buttons */}
         {isEditing && (
           <View style={styles.actionSection}>
-            <TouchableOpacity
-              style={[styles.actionButton, styles.saveButton]}
+            <ResponsiveButton
+              title={isLoading ? 'Saving...' : 'Save Changes'}
               onPress={handleSave}
               disabled={isLoading}
-            >
-              <Text style={styles.saveButtonText}>
-                {isLoading ? 'Saving...' : 'Save Changes'}
-              </Text>
-            </TouchableOpacity>
+              size={isTablet ? 'large' : 'medium'}
+              style={styles.saveButton}
+            />
           </View>
         )}
 
         {/* Delete Button */}
-        <TouchableOpacity
-          style={styles.deleteButton}
+        <ResponsiveButton
+          title="Delete Item"
+          icon="trash-outline"
           onPress={handleDelete}
-        >
-          <Ionicons name="trash-outline" size={20} color={colors.error} />
-          <Text style={styles.deleteButtonText}>Delete Item</Text>
-        </TouchableOpacity>
+          variant="secondary"
+          size={isTablet ? 'large' : 'medium'}
+          style={styles.deleteButton}
+        />
       </ScrollView>
 
       {showDatePicker && (
@@ -221,7 +233,7 @@ const ItemDetailScreen = ({ route, navigation }) => {
           minimumDate={new Date()}
         />
       )}
-    </View>
+    </ResponsiveContainer>
   );
 };
 
@@ -230,134 +242,78 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    paddingTop: 60,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  backButton: {
-    padding: 8,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text,
-  },
-  editButton: {
-    padding: 8,
-  },
   content: {
-    padding: 20,
+    padding: isTablet ? spacing.xl : spacing.md,
   },
   imageSection: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: isTablet ? spacing.xl : spacing.lg,
   },
   foodImage: {
-    width: 200,
-    height: 200,
-    borderRadius: 12,
+    width: '100%',
+    height: '100%',
+    borderRadius: borderRadius.lg,
   },
   statusSection: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: isTablet ? spacing.xl : spacing.lg,
   },
   statusBadge: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginBottom: 8,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.round,
+    marginBottom: spacing.sm,
   },
   statusText: {
     color: colors.surface,
-    fontSize: 14,
     fontWeight: 'bold',
   },
   daysText: {
-    fontSize: 16,
     color: colors.textSecondary,
   },
   detailsSection: {
     backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 24,
+    borderRadius: borderRadius.lg,
+    padding: isTablet ? spacing.xl : spacing.lg,
+    marginBottom: isTablet ? spacing.xl : spacing.lg,
   },
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
   detailLabel: {
-    fontSize: 16,
-    fontWeight: '600',
     color: colors.text,
     flex: 1,
   },
   detailValue: {
-    fontSize: 16,
     color: colors.textSecondary,
     flex: 2,
     textAlign: 'right',
   },
   editInput: {
-    fontSize: 16,
     color: colors.text,
     flex: 2,
     textAlign: 'right',
     borderBottomWidth: 1,
     borderBottomColor: colors.primary,
-    paddingVertical: 4,
+    paddingVertical: spacing.xs,
   },
   dateButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
     flex: 2,
     justifyContent: 'flex-end',
   },
-  dateButtonText: {
-    fontSize: 16,
-    color: colors.text,
-    marginRight: 8,
-  },
   actionSection: {
-    marginBottom: 24,
-  },
-  actionButton: {
-    borderRadius: 8,
-    padding: 15,
-    alignItems: 'center',
+    marginBottom: isTablet ? spacing.xl : spacing.lg,
   },
   saveButton: {
     backgroundColor: colors.primary,
   },
-  saveButtonText: {
-    color: colors.surface,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   deleteButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 15,
-    borderWidth: 1,
     borderColor: colors.error,
-    borderRadius: 8,
-  },
-  deleteButtonText: {
-    color: colors.error,
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
   },
 });
 

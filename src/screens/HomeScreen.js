@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Text,
   FlatList,
-  TouchableOpacity,
-  StyleSheet,
   RefreshControl,
   Alert,
-  Image
+  Image,
+  StyleSheet,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { foodService } from '../services/foodService';
 import { authService } from '../services/authService';
 import { colors } from '../constants/colors';
@@ -21,6 +18,20 @@ import {
   getDaysUntilExpiry 
 } from '../utils/dateUtils';
 import { getCategoryIcon } from '../constants/categories';
+import {
+  ResponsiveContainer,
+  ResponsiveCard,
+  ResponsiveText,
+  ResponsiveIconButton,
+  ResponsiveFAB,
+  ResponsiveHeader,
+  ResponsiveEmptyState,
+} from '../components/ResponsiveComponents';
+import {
+  spacing,
+  borderRadius,
+  isTablet,
+} from '../utils/responsive';
 
 const HomeScreen = ({ navigation }) => {
   const [foodItems, setFoodItems] = useState([]);
@@ -107,23 +118,26 @@ const HomeScreen = ({ navigation }) => {
     const categoryIcon = getCategoryIcon(item.category);
 
     return (
-      <TouchableOpacity
+      <ResponsiveCard
         style={[styles.foodItem, { borderLeftColor: statusColor }]}
         onPress={() => navigation.navigate('ItemDetail', { item })}
       >
         <View style={styles.itemHeader}>
           <View style={styles.itemInfo}>
-            <Text style={styles.itemName}>{item.name}</Text>
-            <Text style={styles.itemCategory}>
+            <ResponsiveText variant="subtitle" style={styles.itemName}>
+              {item.name}
+            </ResponsiveText>
+            <ResponsiveText variant="caption" style={styles.itemCategory}>
               {categoryIcon} {item.category}
-            </Text>
+            </ResponsiveText>
           </View>
-          <TouchableOpacity
-            style={styles.deleteButton}
+          <ResponsiveIconButton
+            icon="trash-outline"
             onPress={() => handleDeleteItem(item.id, item.name)}
-          >
-            <Ionicons name="trash-outline" size={20} color={colors.error} />
-          </TouchableOpacity>
+            variant="secondary"
+            size="sm"
+            style={styles.deleteButton}
+          />
         </View>
 
         <View style={styles.itemDetails}>
@@ -131,50 +145,43 @@ const HomeScreen = ({ navigation }) => {
             <Image source={{ uri: item.imageUrl }} style={styles.itemImage} />
           )}
           <View style={styles.itemText}>
-            <Text style={styles.expiryDate}>
+            <ResponsiveText variant="caption" style={styles.expiryDate}>
               Expires: {formatDate(item.expiryDate)}
-            </Text>
-            <Text style={[styles.statusText, { color: statusColor }]}>
+            </ResponsiveText>
+            <ResponsiveText variant="body" style={[styles.statusText, { color: statusColor }]}>
               {getStatusText(status)}
               {daysUntilExpiry !== null && (
-                <Text style={styles.daysText}>
+                <ResponsiveText variant="caption" style={styles.daysText}>
                   {daysUntilExpiry < 0 
                     ? ` (${Math.abs(daysUntilExpiry)} days ago)`
                     : ` (${daysUntilExpiry} days left)`
                   }
-                </Text>
+                </ResponsiveText>
               )}
-            </Text>
+            </ResponsiveText>
           </View>
         </View>
-      </TouchableOpacity>
+      </ResponsiveCard>
     );
   };
 
   const renderEmptyState = () => (
-    <View style={styles.emptyState}>
-      <Ionicons name="restaurant-outline" size={64} color={colors.textSecondary} />
-      <Text style={styles.emptyTitle}>No food items yet</Text>
-      <Text style={styles.emptySubtitle}>
-        Add your first food item to start tracking
-      </Text>
-      <TouchableOpacity
-        style={styles.addFirstButton}
-        onPress={() => navigation.navigate('AddItem')}
-      >
-        <Text style={styles.addFirstButtonText}>Add Food Item</Text>
-      </TouchableOpacity>
-    </View>
+    <ResponsiveEmptyState
+      icon="restaurant-outline"
+      title="No food items yet"
+      subtitle="Add your first food item to start tracking"
+      actionTitle="Add Food Item"
+      onAction={() => navigation.navigate('AddItem')}
+    />
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>🍎 FoodSaver</Text>
-        <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
-          <Ionicons name="log-out-outline" size={24} color={colors.text} />
-        </TouchableOpacity>
-      </View>
+    <ResponsiveContainer style={styles.container}>
+      <ResponsiveHeader
+        title="🍎 FoodSaver"
+        rightIcon="log-out-outline"
+        onRightPress={handleSignOut}
+      />
 
       <FlatList
         data={foodItems}
@@ -185,15 +192,15 @@ const HomeScreen = ({ navigation }) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         ListEmptyComponent={!loading ? renderEmptyState : null}
+        showsVerticalScrollIndicator={false}
       />
 
-      <TouchableOpacity
-        style={styles.fab}
+      <ResponsiveFAB
+        icon="add"
         onPress={() => navigation.navigate('AddItem')}
-      >
-        <Ionicons name="add" size={24} color={colors.surface} />
-      </TouchableOpacity>
-    </View>
+        style={styles.fab}
+      />
+    </ResponsiveContainer>
   );
 };
 
@@ -202,133 +209,58 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    paddingTop: 60,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.primary,
-  },
-  signOutButton: {
-    padding: 8,
-  },
   listContainer: {
-    padding: 16,
+    padding: spacing.md,
     flexGrow: 1,
   },
   foodItem: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
     borderLeftWidth: 4,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginBottom: spacing.md,
   },
   itemHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   itemInfo: {
     flex: 1,
   },
   itemName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   itemCategory: {
-    fontSize: 14,
     color: colors.textSecondary,
   },
   deleteButton: {
-    padding: 4,
+    padding: spacing.xs,
   },
   itemDetails: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   itemImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    marginRight: 12,
+    width: isTablet ? 80 : 60,
+    height: isTablet ? 80 : 60,
+    borderRadius: borderRadius.md,
+    marginRight: spacing.md,
   },
   itemText: {
     flex: 1,
   },
   expiryDate: {
-    fontSize: 14,
     color: colors.textSecondary,
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   statusText: {
-    fontSize: 14,
     fontWeight: '600',
   },
   daysText: {
-    fontSize: 12,
     color: colors.textSecondary,
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 40,
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptySubtitle: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  addFirstButton: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  addFirstButtonText: {
-    color: colors.surface,
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   fab: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    bottom: spacing.lg,
+    right: spacing.lg,
   },
 });
 
